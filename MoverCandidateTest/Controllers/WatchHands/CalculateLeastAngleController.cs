@@ -5,7 +5,7 @@ using System;
 namespace MoverCandidateTest.Controllers.WatchHands
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/WatchHands/[controller]")]
     public class CalculateLeastAngleController : ControllerBase
     {
         private readonly ILogger<CalculateLeastAngleController> _logger;
