@@ -1,10 +1,10 @@
-# Mover Candidate Test
+# M Candidate Test
 
 ## Introduktion
 
 Dear candidate.
 
-Welcome to the Mover Candidate Test.
+Welcome to the M Candidate Test.
 Please use you preferred way of working, and show us what you can :)
 
 Enjoy!
