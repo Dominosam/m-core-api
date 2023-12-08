@@ -77,3 +77,13 @@ GET /api/inventory/item/{sku}: Retrieve details of an inventory item by SKU.
 GET /api/inventory/item: Retrieve details of all inventory items.
 
 For detailed API documentation, refer to the Swagger UI.
+
+
+
+## Possible additions:
+
+### API:
+- Authentication
+- Connect Redis sink to logging feature
+- Extend generic validation
+
