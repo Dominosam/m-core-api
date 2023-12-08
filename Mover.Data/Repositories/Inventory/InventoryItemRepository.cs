@@ -17,6 +17,11 @@ namespace Mover.Data.Repositories.Inventory
             _inventoryItems = database.GetCollection<InventoryItem>("InventoryItems");
         }
 
+        public InventoryItemRepository(IMongoDatabase mongoDatabase)
+        {
+            _inventoryItems = mongoDatabase.GetCollection<InventoryItem>("InventoryItems");
+        }
+
         public async Task<InventoryItemAction> UpsertAsync(InventoryItem inventoryItem)
         {
             var filter = Builders<InventoryItem>.Filter.Eq(x => x.SKU, inventoryItem.SKU);

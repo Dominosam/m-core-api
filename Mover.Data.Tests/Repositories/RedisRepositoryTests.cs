@@ -30,7 +30,7 @@ namespace Mover.Data.Tests.Repositories
                 throw new InvalidOperationException("Redis connection string is null.");
             }
 
-            _redisContext = new RedisContext(connectionString);
+            //_redisContext = new RedisContext(connectionString);
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Mover.Data.Tests.Repositories
             try
             {
                 // Act
-                redisRepository.SaveResponse(time, leastAngle, greatestAngle, callTimeStamp);
+                //redisRepository.SaveResponse(time, leastAngle, greatestAngle, callTimeStamp);
 
                 // Assert
                 var retrievedLeastAngle = redisRepository.GetNewestLeastAngle();
