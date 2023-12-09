@@ -25,37 +25,28 @@ namespace Mover.API.Controllers.WatchHands
             try
             {
                 RequestModelValidator.Validate(requestModel);
-
                 double leastAngle = _watchHandsAngleService.CalculateLeastAngleFromTime(requestModel.TimeStamp);
 
-                Log.Information($"Calculated least angle: {leastAngle}");
+                var responseMessage = $"Least Angle: {leastAngle}";
+                Log.Information(responseMessage);
 
-                return Ok($"Least Angle: {leastAngle}");
+                return Ok(responseMessage);
             }
             catch (ValidationException ex)
             {
                 Log.Error(ex, "Request model validation failed.");
-
                 return BadRequest(ex.Message);
             }
             catch (InvalidTimestampException ex)
             {
                 var errorMessage = $"Invalid timestamp provided.";
                 Log.Error(ex, errorMessage);
-
                 return BadRequest(errorMessage);
-            }
-            catch (CalculateLeastAngleException ex)
-            {
-                Log.Error(ex, $"Error calculating least angle: {ex.Message}");
-
-                return StatusCode(500, $"An error occurred while calculating the least angle: {ex.Message}");
             }
             catch (Exception ex)
             {
-                var errorMessage = $"An unexpected error occurred..";
+                var errorMessage = $"An unexpected error occurred.";
                 Log.Error(ex, errorMessage);
-
                 return StatusCode(500, errorMessage);
             }
         }

@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mover.Data.Tests", "Mover.D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mover.Core.Inventory", "Mover.Core.Inventory\Mover.Core.Inventory.csproj", "{78269B86-516C-41FA-B55F-E15620B42C23}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mover.Core.Inventory.Tests", "Mover.Core.Inventory.Tests\Mover.Core.Inventory.Tests.csproj", "{E88577CF-CE76-45CE-9E89-BDFB0FB96E76}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{78269B86-516C-41FA-B55F-E15620B42C23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78269B86-516C-41FA-B55F-E15620B42C23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78269B86-516C-41FA-B55F-E15620B42C23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E88577CF-CE76-45CE-9E89-BDFB0FB96E76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E88577CF-CE76-45CE-9E89-BDFB0FB96E76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E88577CF-CE76-45CE-9E89-BDFB0FB96E76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E88577CF-CE76-45CE-9E89-BDFB0FB96E76}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{85E06D1F-5983-4E41-98D8-69683E0796DC} = {1F3D2B49-D368-4DD3-B6A0-90B49786F91E}
 		{15F8D31D-9188-47E0-8D92-749DFF197B93} = {EE79A665-800C-4FD2-9EDC-E65C7DCB01B4}
 		{78269B86-516C-41FA-B55F-E15620B42C23} = {1F3D2B49-D368-4DD3-B6A0-90B49786F91E}
+		{E88577CF-CE76-45CE-9E89-BDFB0FB96E76} = {EE79A665-800C-4FD2-9EDC-E65C7DCB01B4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7BD85020-EA4F-4E34-AB20-38BB72929759}
