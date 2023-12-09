@@ -1,4 +1,5 @@
-﻿namespace Mover.API.Exceptions.InventoryItem
+﻿
+namespace Mover.Core.Inventory.CustomExceptions
 {
     public class InsufficientQuantityException : Exception
     {

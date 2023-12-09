@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Mover.Core.Inventory.CustomExceptions;
 using Mover.Core.Inventory.Interfaces.Services;
 using Mover.Core.Inventory.Models.DTOs;
 using Mover.Data.Interfaces;
 using Mover.Data.Repositories.Inventory.Models;
 using Mover.Data.Repositories.Inventory.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Mover.Core.Inventory.Services
 {
@@ -18,19 +20,57 @@ namespace Mover.Core.Inventory.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<InventoryItemAction> UpsertInventoryItem(InventoryItemDto inventoryItem)
+        public async Task<string> UpsertInventoryItem(InventoryItemDto inventoryItem)
         {
-            return await _inventoryItemRepository.UpsertAsync(_mapper.Map<InventoryItem>(inventoryItem));
+            var action = await _inventoryItemRepository.UpsertAsync(_mapper.Map<InventoryItem>(inventoryItem));
+
+            switch (action)
+            {
+                case InventoryItemAction.AddedQuantity:
+                    return $"Inventory item updated successfully: SKU - {inventoryItem.SKU}, added quantity by: {inventoryItem.Quantity}";
+
+                case InventoryItemAction.Inserted:
+                default:
+                    return $"Inventory item created successfully: SKU - {inventoryItem.SKU}";
+            }
         }
-        public async Task<InventoryItemAction> RemoveInventoryItemQuantity(string sku, int quantity)
+        public async Task RemoveInventoryItemQuantity(string sku, int quantity)
         {
-            return await _inventoryItemRepository.RemoveQuantity(sku, quantity);
+            if (string.IsNullOrWhiteSpace(sku))
+            {
+                throw new MissingSkuException("SKU is required.");
+            }
+
+            if (quantity <= 0)
+            {
+                throw new InsufficientQuantityException("Quantity must be greater than zero.");
+            }
+
+            var action = await _inventoryItemRepository.RemoveQuantity(sku, quantity);
+
+            if (action != InventoryItemAction.RemovedQuantity)
+            {
+                throw new ValidationException($"Failed to remove quantity - {quantity} - from inventory item: SKU - {sku}");
+            }
         }
 
         public InventoryItemDto? GetInventoryItemBySKU(string sku)
         {
-            var inventoryItem = _inventoryItemRepository.GetBySKU(sku);
-            return _mapper.Map<InventoryItemDto>(inventoryItem);
+            if (string.IsNullOrEmpty(sku))
+            {
+                var errorMessage = $"SKU is required.";
+                throw new MissingSkuException(errorMessage);
+            }
+
+            var itemDetails = _inventoryItemRepository.GetBySKU(sku);
+            if (itemDetails == null)
+            {
+                var notFoundMessage = $"Inventory item not found: SKU - {sku}";
+                throw new InventoryItemNotFoundException(notFoundMessage);
+            }
+
+            return _mapper.Map<InventoryItemDto>(itemDetails);
+
         }
 
         public IEnumerable<InventoryItemDto> GetAllInventoryItems()

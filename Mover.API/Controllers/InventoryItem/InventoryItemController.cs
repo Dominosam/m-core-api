@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Mover.API.Exceptions.InventoryItem;
 using Mover.API.Validation;
+using Mover.Core.Inventory.CustomExceptions;
 using Mover.Core.Inventory.Interfaces.Services;
 using Mover.Core.Inventory.Models.DTOs;
 using Mover.Core.Inventory.Models.Requests;
@@ -38,34 +38,21 @@ namespace Mover.API.Controllers.InventoryItem
             try
             {
                 RequestModelValidator.Validate(requestModel);
-                
-                var action = await _inventoryItemService.UpsertInventoryItem(requestModel);
-                var resultMessage = string.Empty;
-                switch (action)
-                {
-                    case InventoryItemAction.AddedQuantity:
-                        resultMessage = $"Inventory item updated successfully: SKU - {requestModel.SKU}, added quantity by: {requestModel.Quantity}";
-                        Log.Information(resultMessage);
-                        return Ok(resultMessage);
-                    case InventoryItemAction.Inserted:
-                    default:
-                        resultMessage = $"Inventory item created successfully: SKU - {requestModel.SKU}";
-                        Log.Information(resultMessage);
-                        return Ok(resultMessage);
-                }
 
+                var resultMessage = await _inventoryItemService.UpsertInventoryItem(requestModel);
+                Log.Information(resultMessage);
+
+                return Ok(resultMessage);
             }
             catch (ValidationException ex)
             {
                 Log.Error(ex, "Request model validation failed.");
-
                 return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
                 var errorMessage = $"An unexpected error occurred.";
                 Log.Error(ex, errorMessage);
-
                 return StatusCode(500, errorMessage);
             }
         }
@@ -86,57 +73,35 @@ namespace Mover.API.Controllers.InventoryItem
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(requestModel.SKU))
-                {
-                    throw new ValidationException("SKU is required.");
-                }
-
-                if (requestModel.Quantity <= 0)
-                {
-                    throw new ValidationException("Quantity must be greater than zero.");
-                }
-
-                var action = await _inventoryItemService.RemoveInventoryItemQuantity(requestModel.SKU, requestModel.Quantity);
-                var resultMessage = string.Empty;
-                switch (action)
-                {
-                    case InventoryItemAction.RemovedQuantity:
-                        resultMessage = $"Removed quantity - {requestModel.Quantity} - from inventory item: SKU - {requestModel.SKU}";
-                        Log.Information(resultMessage);
-                        return Ok(resultMessage);
-
-                    case InventoryItemAction.Failed:
-                    default:
-                        resultMessage = $"Failed to remove quantity - {requestModel.Quantity} - from inventory item: SKU - {requestModel.SKU}";
-                        throw new ValidationException(resultMessage);
-                }
+                await _inventoryItemService.RemoveInventoryItemQuantity(requestModel.SKU, requestModel.Quantity);
+                var resultMessage = $"Removed quantity - {requestModel.Quantity} - from inventory item: SKU - {requestModel.SKU}";
+                Log.Information(resultMessage);
+                return Ok(resultMessage);
             }
             catch (InsufficientQuantityException ex)
             {
-                Log.Error(ex, $"Insufficient quantity to remove: SKU - {requestModel.SKU}");
-
+                Log.Error(ex.Message);
+                return BadRequest(ex.Message);
+            }
+            catch (MissingSkuException ex)
+            {
+                Log.Error(ex.Message);
                 return BadRequest(ex.Message);
             }
             catch (ValidationException ex)
             {
-                Log.Error(ex, "Request model validation failed.");
-
-                return BadRequest(ex.Message);
+                var errorMessage = "Request model validation failed.";
+                Log.Error(ex, errorMessage);
+                return BadRequest(errorMessage);
             }
             catch (Exception ex)
             {
                 var errorMessage = $"An unexpected error occurred.";
                 Log.Error(ex, errorMessage);
-
                 return StatusCode(500, errorMessage);
             }
         }
 
-        /// <summary>
-        /// Retrieves details of an inventory item.
-        /// </summary>
-        /// <param name="sku">The SKU of the inventory item.</param>
-        /// <returns>Details of the inventory item.</returns>
         [HttpGet("{sku}")]
         [SwaggerOperation("GetInventoryItemDetails")]
         [ProducesResponseType(typeof(InventoryItemDto), StatusCodes.Status200OK)]
@@ -145,46 +110,33 @@ namespace Mover.API.Controllers.InventoryItem
         {
             try
             {
-                if(string.IsNullOrEmpty(sku))
-                {
-                    var errorMessage = $"SKU is required.";
-                    Log.Error(errorMessage);
-
-                    throw new ValidationException("SKU is required.");
-                }
-
                 var itemDetails = _inventoryItemService.GetInventoryItemBySKU(sku);
-                if(itemDetails == null)
-                {
-                    var notFoundMessage = $"Inventory item not found: SKU - {sku}";
-                    Log.Information(notFoundMessage);
-
-                    return Ok(notFoundMessage);
-                }
-
                 Log.Information($"Retrieved details for inventory item: SKU - {sku}");
-
                 return Ok(itemDetails);
             }
             catch (ValidationException ex)
             {
-                Log.Error(ex, "Request model validation failed.");
-
+                Log.Error(ex.Message);
+                return BadRequest(ex.Message);
+            }
+            catch (MissingSkuException ex)
+            {
+                Log.Error(ex.Message);
+                return BadRequest(ex.Message);
+            }
+            catch (InventoryItemNotFoundException ex)
+            {
+                Log.Error(ex.Message);
                 return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
                 var errorMessage = $"An unexpected error occurred.";
                 Log.Error(ex, errorMessage);
-
                 return StatusCode(500, errorMessage);
             }
         }
 
-        /// <summary>
-        /// Retrieves details of all inventory items.
-        /// </summary>
-        /// <returns>Details of all inventory items.</returns>
         [HttpGet]
         [SwaggerOperation("GetAllInventory")]
         [ProducesResponseType(typeof(List<InventoryItemDto>), StatusCodes.Status200OK)]
@@ -194,16 +146,13 @@ namespace Mover.API.Controllers.InventoryItem
             try
             {
                 var items = _inventoryItemService.GetAllInventoryItems();
-
                 Log.Information($"Retrieved all inventory items");
-
                 return Ok(items);
             }
             catch (Exception ex)
             {
                 var errorMessage = $"An unexpected error occurred.";
                 Log.Error(ex, errorMessage);
-
                 return StatusCode(500, errorMessage);
             }
         }
