@@ -29,6 +29,11 @@ namespace Mover.Data.Repositories.Inventory
 
             if (existingInventoryItem != null)
             {
+                if(existingInventoryItem.Description != inventoryItem.Description)
+                {
+                    return InventoryItemAction.Failed;
+                }
+
                 existingInventoryItem.Quantity += inventoryItem.Quantity;
                 await _inventoryItems.ReplaceOneAsync(filter, existingInventoryItem);
                 return InventoryItemAction.AddedQuantity;

@@ -30,8 +30,10 @@ namespace Mover.Core.Inventory.Services
                     return $"Inventory item updated successfully: SKU - {inventoryItem.SKU}, added quantity by: {inventoryItem.Quantity}";
 
                 case InventoryItemAction.Inserted:
-                default:
                     return $"Inventory item created successfully: SKU - {inventoryItem.SKU}";
+                case InventoryItemAction.Failed:
+                default:
+                    throw new NotMatchingItemFoundException($"Failed to match inventory item: SKU - {inventoryItem.SKU}");
             }
         }
         public async Task RemoveInventoryItemQuantity(string sku, int quantity)

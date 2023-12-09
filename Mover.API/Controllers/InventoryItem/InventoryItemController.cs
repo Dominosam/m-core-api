@@ -44,6 +44,11 @@ namespace Mover.API.Controllers.InventoryItem
 
                 return Ok(resultMessage);
             }
+            catch(NotMatchingItemFoundException ex)
+            {
+                Log.Error(ex.Message);
+                return BadRequest(ex.Message);
+            }
             catch (ValidationException ex)
             {
                 Log.Error(ex, "Request model validation failed.");
