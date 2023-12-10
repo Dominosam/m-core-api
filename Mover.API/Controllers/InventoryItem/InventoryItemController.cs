@@ -72,7 +72,8 @@ namespace Mover.API.Controllers.InventoryItem
         [SwaggerOperation("RemoveQuantity")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(InsufficientQuantityException), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MissingSkuException), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationException), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<string>> RemoveQuantity([FromBody] RemoveQuantityRequestModel requestModel)
         {
@@ -110,6 +111,9 @@ namespace Mover.API.Controllers.InventoryItem
         [HttpGet("{sku}")]
         [SwaggerOperation("GetInventoryItemDetails")]
         [ProducesResponseType(typeof(InventoryItemDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationException), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(MissingSkuException), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(InventoryItemNotFoundException), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public ActionResult<InventoryItemDto> GetInventoryItemDetails(string sku)
         {

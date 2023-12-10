@@ -1,70 +1,39 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
+using Moq;
 using Mover.Data.Contexts;
+using Mover.Data.Interfaces;
 using Mover.Data.Repositories.Watch;
+using StackExchange.Redis;
 
 namespace Mover.Data.Tests.Repositories
 {
     public class RedisRepositoryTests
     {
-        private readonly IConfiguration _configuration;
-        private readonly RedisContext _redisContext;
-
-        private const string CONNECTION_STRING_KEY = "Redis";
-
-        private readonly string _defaultRepositoryKey = "watch";
+        private readonly Mock<IRedisContext> _redisContextMock;
+        private readonly Mock<IDatabase> _databaseMock;
+        private readonly WatchHandsRepository _repository;
 
         public RedisRepositoryTests()
         {
-            // Just for testing purposes, we're using the same appsettings.json file that the Mover.Data project uses
-            var configPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "Mover.Data.Tests", "Configurations", "appsettings.redis.json");
-
-            _configuration = new ConfigurationBuilder()
-                .AddJsonFile(configPath, optional: false, reloadOnChange: true)
-                .Build();
-
-            var connectionString = _configuration.GetConnectionString(CONNECTION_STRING_KEY);
-
-            if (connectionString == null)
-            {
-                throw new InvalidOperationException("Redis connection string is null.");
-            }
-
-            //_redisContext = new RedisContext(connectionString);
+            _redisContextMock = new Mock<IRedisContext>();
+            _databaseMock = new Mock<IDatabase>();
+            _redisContextMock.Setup(x => x.GetDatabase()).Returns(_databaseMock.Object);
+            _repository = new WatchHandsRepository(_redisContextMock.Object);
         }
 
         [Fact]
-        public void SaveAndRetrieveResponse_ShouldWork()
+        public void SaveResponse_ShouldSaveWatchBaseToRedis()
         {
             // Arrange
-            var redisRepository = new WatchHandsRepository(_redisContext);
-
             var time = DateTime.UtcNow;
-            var leastAngle = 42.0;
-            var greatestAngle = 60.0;
-            var callTimeStamp = DateTime.UtcNow;
+            var leastAngle = 30.0;
 
-            try
-            {
-                // Act
-                //redisRepository.SaveResponse(time, leastAngle, greatestAngle, callTimeStamp);
+            // Act
+            var result = _repository.SaveWatchResponse(time, leastAngle);
 
-                // Assert
-                var retrievedLeastAngle = redisRepository.GetNewestLeastAngle();
-
-                Assert.NotNull(retrievedLeastAngle);
-                Assert.Equal(leastAngle, retrievedLeastAngle);
-            }
-            finally
-            {
-                DeleteResponseFromRedis();
-            }
-        }
-
-        private void DeleteResponseFromRedis()
-        {
-            var database = _redisContext.GetDatabase();
-            database.KeyDelete(_defaultRepositoryKey);
+            // Assert
+            Assert.True(result);
         }
     }
 

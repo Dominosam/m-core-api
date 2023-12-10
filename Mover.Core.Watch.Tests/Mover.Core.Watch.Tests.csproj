@@ -10,7 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
     <PackageReference Include="Moq" Version="4.20.70" />
     <PackageReference Include="xunit" Version="2.4.2" />
@@ -25,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mover.Core.Inventory\Mover.Core.Inventory.csproj" />
+    <ProjectReference Include="..\Mover.Core.Watch\Mover.Core.Watch.csproj" />
     <ProjectReference Include="..\Mover.Data\Mover.Data.csproj" />
   </ItemGroup>
 

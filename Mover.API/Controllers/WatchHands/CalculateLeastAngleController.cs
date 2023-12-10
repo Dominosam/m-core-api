@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Mover.API.Exceptions.Watch;
 using Mover.API.Validation;
+using Mover.Core.Inventory.CustomExceptions;
 using Mover.Core.Watch.Interfaces.Services;
 using Mover.Core.Watch.Models.Request;
 using Serilog;
@@ -20,6 +21,9 @@ namespace Mover.API.Controllers.WatchHands
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationException), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Exception), StatusCodes.Status500InternalServerError)]
         public ActionResult<string> Get([FromQuery] CalculateLeastAngleRequest requestModel)
         {
             try
@@ -36,12 +40,6 @@ namespace Mover.API.Controllers.WatchHands
             {
                 Log.Error(ex, "Request model validation failed.");
                 return BadRequest(ex.Message);
-            }
-            catch (InvalidTimestampException ex)
-            {
-                var errorMessage = $"Invalid timestamp provided.";
-                Log.Error(ex, errorMessage);
-                return BadRequest(errorMessage);
             }
             catch (Exception ex)
             {

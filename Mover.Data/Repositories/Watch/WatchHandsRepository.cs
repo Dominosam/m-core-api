@@ -2,6 +2,7 @@
 using Mover.Data.Interfaces;
 using Mover.Data.Repositories.Watch.Models;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace Mover.Data.Repositories.Watch
 {
@@ -15,7 +16,7 @@ namespace Mover.Data.Repositories.Watch
             _redisContext = redisContext ?? throw new ArgumentNullException(nameof(redisContext));
         }
 
-        public void SaveResponse(DateTime time, double leastAngle)
+        public bool SaveWatchResponse(DateTime time, double leastAngle)
         {
             var watchHands = new WatchHands
             {
@@ -29,32 +30,24 @@ namespace Mover.Data.Repositories.Watch
                 WatchHands = watchHands
             };
 
-            SaveResponse(watch);
+            return SaveResponse(watch);
         }
 
-        public double? GetNewestLeastAngle()
+        private bool SaveResponse(WatchBase response)
         {
-            var database = _redisContext.GetDatabase();
-            var serializedResponses = database.ListRange(_defaultRepositoryKey);
-
-            if (serializedResponses.Any())
+            try
             {
-                var responses = serializedResponses.Select(sr => JsonConvert.DeserializeObject<WatchBase>(sr));
-                var newestResponse = responses.OrderByDescending(r => r.Time).FirstOrDefault();
+                var database = _redisContext.GetDatabase();
+                var serializedResponse = JsonConvert.SerializeObject(response);
 
-                return newestResponse?.WatchHands.LeastAngle;
+                database.StringSet(_defaultRepositoryKey, serializedResponse);
+                return true; 
             }
-
-            return null;
-        }
-
-        private void SaveResponse(WatchBase response)
-        {
-            var database = _redisContext.GetDatabase();
-            var serializedResponse = JsonConvert.SerializeObject(response);
-
-            // Save the serialized response to Redis
-            database.StringSet(_defaultRepositoryKey, serializedResponse);
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                return false; // Indicate failure
+            }
         }
     }
 }

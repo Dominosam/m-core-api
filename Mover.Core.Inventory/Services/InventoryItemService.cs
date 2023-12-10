@@ -78,6 +78,12 @@ namespace Mover.Core.Inventory.Services
         public IEnumerable<InventoryItemDto> GetAllInventoryItems()
         {
             var allItems = _inventoryItemRepository.GetAll();
+            if (allItems == null)
+            {
+                var errorMessage = $"Failed to retrieve inventory items.";
+                throw new Exception(errorMessage);
+            }
+
             return _mapper.Map<IEnumerable<InventoryItemDto>>(allItems);
         }
     }

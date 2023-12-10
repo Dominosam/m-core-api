@@ -21,7 +21,7 @@ namespace Mover.Core.Watch.Services
         public double CalculateLeastAngleFromTime(DateTime time)
         {
             double leastAngle = CalculateLeastAngleDifference(time);
-            _repository.SaveResponse(time, leastAngle);
+            _repository.SaveWatchResponse(time, leastAngle);
 
             return leastAngle;
         }
@@ -30,7 +30,7 @@ namespace Mover.Core.Watch.Services
         {
             var currentTime = DateTime.Now;
             double leastAngle = CalculateLeastAngleDifference(currentTime);
-            _repository.SaveResponse(DateTime.Now, leastAngle);
+            _repository.SaveWatchResponse(DateTime.Now, leastAngle);
 
             return leastAngle;
         }
@@ -38,7 +38,7 @@ namespace Mover.Core.Watch.Services
         public WatchResponse GetWatchFromTime(DateTime time)
         {
             double leastAngle = CalculateLeastAngleDifference(time);
-            _repository.SaveResponse(time, leastAngle);
+            _repository.SaveWatchResponse(time, leastAngle);
 
             return GetResponse(time, leastAngle);
         }
@@ -47,7 +47,7 @@ namespace Mover.Core.Watch.Services
         {
             var currentTime = DateTime.Now;
             double leastAngle = CalculateLeastAngleDifference(currentTime);
-            _repository.SaveResponse(DateTime.Now, leastAngle);
+            _repository.SaveWatchResponse(DateTime.Now, leastAngle);
 
             return GetResponse(currentTime, leastAngle);
         }
